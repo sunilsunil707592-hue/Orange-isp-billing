@@ -3,52 +3,54 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Orange Network Solution - ISP Billing</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Orange Network Solution</title>
+
 <style>
 *{box-sizing:border-box}
-body{margin:0;font-family:Arial,sans-serif;background:#f4f6f8;color:#202124}
-header{background:#ff7a00;color:white;padding:18px;text-align:center}
-header h1{margin:0;font-size:24px}
-header small{display:block;margin-top:5px}
-nav{display:flex;overflow-x:auto;background:#fff;border-bottom:1px solid #ddd;position:sticky;top:0;z-index:10}
-nav button{flex:1;min-width:100px;padding:14px 10px;border:0;background:white;font-weight:bold}
-nav button:hover{background:#fff2e6}
-main{max-width:1100px;margin:auto;padding:15px}
-.page{display:none}.page.active{display:block}
+body{margin:0;font-family:Arial,sans-serif;background:#f4f6f8;color:#222}
+header{background:#ff7900;color:white;padding:18px;text-align:center}
+header h1{margin:0;font-size:25px}
+header p{margin:5px 0 0}
+nav{display:flex;overflow-x:auto;background:white;border-bottom:1px solid #ddd}
+nav button{border:0;background:white;padding:15px 16px;font-weight:bold;white-space:nowrap}
+nav button.active{color:#ff7900;border-bottom:3px solid #ff7900}
+main{max-width:1000px;margin:auto;padding:15px}
+.page{display:none}
+.page.active{display:block}
+.card{background:white;border-radius:12px;padding:16px;margin-bottom:14px;box-shadow:0 2px 8px #00000012}
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
-.card{background:white;border-radius:12px;padding:16px;box-shadow:0 2px 8px #0001;margin-bottom:14px}
-.stat strong{display:block;font-size:25px;color:#ff7a00;margin-top:7px}
-h2{margin-top:5px}
-input,select,textarea{width:100%;padding:11px;margin:6px 0 12px;border:1px solid #ccc;border-radius:8px;font-size:16px}
-label{font-size:13px;font-weight:bold}
-.btn{border:0;border-radius:8px;padding:11px 15px;background:#ff7a00;color:white;font-weight:bold;font-size:15px}
-.btn2{background:#555}.danger{background:#c62828}
+.stat{text-align:center}
+.stat b{font-size:26px;color:#ff7900}
+input,select{width:100%;padding:12px;margin:6px 0;border:1px solid #ccc;border-radius:8px;font-size:16px}
+button.action{background:#ff7900;color:white;border:0;border-radius:8px;padding:11px 16px;margin:5px 3px;font-weight:bold}
+button.secondary{background:#555}
+button.danger{background:#c62828}
 table{width:100%;border-collapse:collapse;font-size:14px}
-th,td{padding:10px;border-bottom:1px solid #eee;text-align:left}
-.tablewrap{overflow:auto}
-.badge{padding:4px 8px;border-radius:20px;font-size:12px;background:#eee}
-.paid{background:#d9f7df;color:#176b2c}
-.pending{background:#fff1c7;color:#7a5800}
-.overdue{background:#ffdada;color:#9b1515}
-.actions{display:flex;gap:8px;flex-wrap:wrap}
-.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-@media(max-width:600px){.two{grid-template-columns:1fr}main{padding:10px}}
+th,td{padding:10px;border-bottom:1px solid #ddd;text-align:left}
+.tablewrap{overflow-x:auto}
+.badge{padding:4px 8px;border-radius:12px;background:#e7f6e7}
+.inactive{background:#eee}
+h2{color:#333}
+small{color:#666}
 </style>
 </head>
+
 <body>
 
 <header>
 <h1>Orange Network Solution</h1>
-<small>ISP Billing & Inventory Management</small>
+<p>ISP Billing & Inventory Management</p>
 </header>
 
 <nav>
-<button onclick="show('dashboard')">Dashboard</button>
-<button onclick="show('customers')">Customers</button>
-<button onclick="show('billing')">Billing</button>
-<button onclick="show('inventory')">Inventory</button>
-<button onclick="show('reports')">Reports</button>
-<button onclick="show('backup')">Backup</button>
+<button onclick="showPage('dashboard',this)" class="active">Dashboard</button>
+<button onclick="showPage('customers',this)">Customers</button>
+<button onclick="showPage('plans',this)">Plans</button>
+<button onclick="showPage('billing',this)">Billing</button>
+<button onclick="showPage('inventory',this)">Inventory</button>
+<button onclick="showPage('reports',this)">Reports</button>
+<button onclick="showPage('backup',this)">Backup</button>
 </nav>
 
 <main>
@@ -56,113 +58,120 @@ th,td{padding:10px;border-bottom:1px solid #eee;text-align:left}
 <section id="dashboard" class="page active">
 <h2>Dashboard</h2>
 <div class="grid">
-<div class="card stat">Total Customers<strong id="dTotal">0</strong></div>
-<div class="card stat">Active Customers<strong id="dActive">0</strong></div>
-<div class="card stat">Monthly Collection<strong id="dCollection">₹0</strong></div>
-<div class="card stat">Pending Bills<strong id="dPending">0</strong></div>
-<div class="card stat">Overdue Bills<strong id="dOverdue">0</strong></div>
-<div class="card stat">Inventory Items<strong id="dStock">0</strong></div>
-</div>
-<div class="card">
-<h3>Recent Payments</h3>
-<div id="recentPayments">No payments yet.</div>
+<div class="card stat"><b id="dCustomers">0</b><br>Customers</div>
+<div class="card stat"><b id="dPlans">0</b><br>Active Plans</div>
+<div class="card stat"><b id="dPayments">₹0</b><br>Payments</div>
+<div class="card stat"><b id="dInventory">0</b><br>Inventory Qty</div>
 </div>
 </section>
 
 <section id="customers" class="page">
 <h2>Customers</h2>
+
 <div class="card">
 <h3>Add New Customer</h3>
-<form id="customerForm">
-<div class="two">
-<div><label>Customer Name</label><input id="cName" required></div>
-<div><label>Phone Number</label><input id="cPhone" type="tel" required></div>
-</div>
-<label>Address / Street</label><textarea id="cAddress"></textarea>
-<div class="two">
-<div><label>Village / City</label><input id="cCity"></div>
-<div><label>PIN Code</label><input id="cPin"></div>
-</div>
-<div class="two">
-<div>
-<label>Internet Plan</label>
-<select id="cPlan">
-<option value="50 Mbps|499">50 Mbps - ₹499</option>
-<option value="80 Mbps|649">80 Mbps - ₹649</option>
-<option value="100 Mbps|699">100 Mbps - ₹699 + Tax</option>
+<input id="cName" placeholder="Customer Name">
+<input id="cPhone" placeholder="Phone Number">
+<input id="cStreet" placeholder="Street / Village">
+<input id="cZip" placeholder="ZIP / PIN Code">
+
+<select id="cPlan"></select>
+
+<input id="cInstall" type="number" placeholder="Installation Amount">
+
+<select id="cRefund">
+<option value="Non-refundable">Non-refundable</option>
+<option value="Refundable">Refundable</option>
 </select>
-</div>
-<div><label>Connection Date</label><input id="cDate" type="date"></div>
-</div>
-<div class="two">
-<div><label>Installation Charge</label><input id="cInstall" type="number" value="500"></div>
-<div><label>Installation Type</label>
-<select id="cRefund"><option>Non-Refundable</option><option>Refundable</option></select></div>
-</div>
-<button class="btn">Save Customer</button>
-</form>
+
+<button class="action" onclick="addCustomer()">Add Customer</button>
 </div>
 
 <div class="card tablewrap">
 <table>
-<thead><tr><th>ID</th><th>Name</th><th>Phone</th><th>Plan</th><th>Fee</th><th>Status</th><th>Action</th></tr></thead>
+<thead>
+<tr>
+<th>Name</th><th>Phone</th><th>Location</th><th>Plan</th><th>Installation</th><th>Action</th>
+</tr>
+</thead>
 <tbody id="customerRows"></tbody>
 </table>
 </div>
 </section>
 
-<section id="billing" class="page">
-<h2>Billing & Payments</h2>
+<section id="plans" class="page">
+<h2>Plans Management</h2>
+
 <div class="card">
-<h3>Add Payment / Bill</h3>
-<form id="billForm">
-<label>Customer</label><select id="bCustomer" required></select>
-<div class="two">
-<div><label>Amount ₹</label><input id="bAmount" type="number" required></div>
-<div><label>Due Date</label><input id="bDue" type="date"></div>
+<h3 id="planFormTitle">Add Internet Plan</h3>
+
+<input type="hidden" id="editPlanId">
+
+<input id="pSpeed" placeholder="Speed — e.g. 50 Mbps">
+<input id="pPrice" type="number" placeholder="Price ₹">
+
+<select id="pTax">
+<option value="No Tax">No Tax</option>
+<option value="Plus Tax">Plus Tax</option>
+</select>
+
+<select id="pStatus">
+<option value="Active">Active</option>
+<option value="Inactive">Inactive</option>
+</select>
+
+<button class="action" onclick="savePlan()">Save Plan</button>
+<button class="action secondary" onclick="resetPlanForm()">Cancel Edit</button>
 </div>
-<div class="two">
-<div><label>Payment Status</label>
-<select id="bStatus"><option>Paid</option><option>Pending</option></select></div>
-<div><label>Payment Method</label>
-<select id="bMethod"><option>Cash</option><option>UPI</option><option>Bank</option></select></div>
-</div>
-<button class="btn">Save Bill / Payment</button>
-</form>
-</div>
+
 <div class="card tablewrap">
 <table>
-<thead><tr><th>Receipt</th><th>Customer</th><th>Date</th><th>Amount</th><th>Method</th><th>Status</th><th>Receipt</th></tr></thead>
-<tbody id="billRows"></tbody>
+<thead>
+<tr>
+<th>Speed</th><th>Price</th><th>Tax</th><th>Status</th><th>Actions</th>
+</tr>
+</thead>
+<tbody id="planRows"></tbody>
+</table>
+</div>
+</section>
+
+<section id="billing" class="page">
+<h2>Billing / Payments</h2>
+
+<div class="card">
+<select id="payCustomer"></select>
+<input id="payAmount" type="number" placeholder="Payment Amount ₹">
+<input id="payDate" type="date">
+<button class="action" onclick="addPayment()">Add Payment</button>
+</div>
+
+<div class="card tablewrap">
+<table>
+<thead>
+<tr><th>Customer</th><th>Amount</th><th>Date</th><th>Action</th></tr>
+</thead>
+<tbody id="paymentRows"></tbody>
 </table>
 </div>
 </section>
 
 <section id="inventory" class="page">
 <h2>Inventory</h2>
+
 <div class="card">
-<form id="inventoryForm">
-<div class="two">
-<div><label>Device Type</label>
-<select id="iType"><option>ONU</option><option>Router</option><option>Switch</option><option>Other</option></select></div>
-<div><label>Model</label><input id="iModel"></div>
+<input id="iItem" placeholder="Item — Router / ONU / Cable">
+<input id="iModel" placeholder="Model">
+<input id="iQty" type="number" placeholder="Quantity">
+<input id="iCost" type="number" placeholder="Purchase Cost ₹">
+<button class="action" onclick="addInventory()">Add Inventory</button>
 </div>
-<div class="two">
-<div><label>Serial Number</label><input id="iSerial"></div>
-<div><label>MAC Address</label><input id="iMac"></div>
-</div>
-<div class="two">
-<div><label>Purchase Price ₹</label><input id="iPrice" type="number"></div>
-<div><label>Supplier</label><input id="iSupplier"></div>
-</div>
-<label>Status</label>
-<select id="iStatus"><option>In Stock</option><option>Installed</option><option>Returned</option><option>Faulty</option></select>
-<button class="btn">Add Inventory</button>
-</form>
-</div>
+
 <div class="card tablewrap">
 <table>
-<thead><tr><th>Type</th><th>Model</th><th>Serial</th><th>MAC</th><th>Status</th><th>Action</th></tr></thead>
+<thead>
+<tr><th>Item</th><th>Model</th><th>Qty</th><th>Cost</th><th>Action</th></tr>
+</thead>
 <tbody id="inventoryRows"></tbody>
 </table>
 </div>
@@ -170,158 +179,370 @@ th,td{padding:10px;border-bottom:1px solid #eee;text-align:left}
 
 <section id="reports" class="page">
 <h2>Reports</h2>
-<div class="grid">
-<div class="card stat">Total Collection<strong id="rCollection">₹0</strong></div>
-<div class="card stat">Paid Bills<strong id="rPaid">0</strong></div>
-<div class="card stat">Pending Bills<strong id="rPending">0</strong></div>
-<div class="card stat">Customers<strong id="rCustomers">0</strong></div>
-</div>
-<div class="card">
-<button class="btn" onclick="window.print()">Print Report / Save PDF</button>
-</div>
+<div class="card" id="reportBox"></div>
 </section>
 
 <section id="backup" class="page">
 <h2>Backup & Restore</h2>
 <div class="card">
-<p>Download a backup regularly so your customer and payment records remain safe.</p>
-<div class="actions">
-<button class="btn" onclick="downloadBackup()">Download Backup</button>
-<label class="btn btn2">Restore Backup
-<input type="file" accept=".json" onchange="restoreBackup(this)" style="display:none">
-</label>
-</div>
+<p>Regular backup रखें ताकि business data सुरक्षित रहे।</p>
+<button class="action" onclick="downloadBackup()">Download Backup</button>
+<input type="file" id="restoreFile" accept=".json">
+<button class="action secondary" onclick="restoreBackup()">Restore Backup</button>
 </div>
 </section>
 
 </main>
 
 <script>
-let db=JSON.parse(localStorage.getItem('orangeISP')||'{"customers":[],"bills":[],"inventory":[]}');
+const KEY="orangeNetworkSolutionDataV2";
+
+let data=JSON.parse(localStorage.getItem(KEY)||"null") || {
+ plans:[
+  {id:1,speed:"50 Mbps",price:499,tax:"No Tax",status:"Active"},
+  {id:2,speed:"80 Mbps",price:649,tax:"No Tax",status:"Active"},
+  {id:3,speed:"100 Mbps",price:699,tax:"Plus Tax",status:"Active"}
+ ],
+ customers:[],
+ payments:[],
+ inventory:[]
+};
 
 function save(){
- localStorage.setItem('orangeISP',JSON.stringify(db));
- render();
-}
-function show(id){
- document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
- document.getElementById(id).classList.add('active');
-}
-function esc(v){
- return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+ localStorage.setItem(KEY,JSON.stringify(data));
+ renderAll();
 }
 
-customerForm.onsubmit=e=>{
- e.preventDefault();
- let p=cPlan.value.split('|');
- db.customers.push({
-  id:'ONS'+String(Date.now()).slice(-6),
-  name:cName.value,phone:cPhone.value,address:cAddress.value,
-  city:cCity.value,pin:cPin.value,speed:p[0],fee:+p[1],
-  date:cDate.value,install:+cInstall.value,refund:cRefund.value,status:'Active'
+function showPage(id,btn){
+ document.querySelectorAll(".page").forEach(x=>x.classList.remove("active"));
+ document.getElementById(id).classList.add("active");
+
+ document.querySelectorAll("nav button").forEach(x=>x.classList.remove("active"));
+ if(btn)btn.classList.add("active");
+
+ renderAll();
+}
+
+function money(n){
+ return "₹"+Number(n||0).toLocaleString("en-IN");
+}
+
+/* PLANS */
+
+function savePlan(){
+ const speed=document.getElementById("pSpeed").value.trim();
+ const price=Number(document.getElementById("pPrice").value);
+ const tax=document.getElementById("pTax").value;
+ const status=document.getElementById("pStatus").value;
+ const editId=document.getElementById("editPlanId").value;
+
+ if(!speed || !price){
+  alert("Speed और Price डालें");
+  return;
+ }
+
+ if(editId){
+  const p=data.plans.find(x=>x.id==editId);
+  if(p){
+   p.speed=speed;
+   p.price=price;
+   p.tax=tax;
+   p.status=status;
+  }
+ }else{
+  data.plans.push({
+   id:Date.now(),
+   speed,
+   price,
+   tax,
+   status
+  });
+ }
+
+ resetPlanForm();
+ save();
+}
+
+function editPlan(id){
+ const p=data.plans.find(x=>x.id==id);
+ if(!p)return;
+
+ document.getElementById("editPlanId").value=p.id;
+ document.getElementById("pSpeed").value=p.speed;
+ document.getElementById("pPrice").value=p.price;
+ document.getElementById("pTax").value=p.tax;
+ document.getElementById("pStatus").value=p.status;
+ document.getElementById("planFormTitle").textContent="Edit Internet Plan";
+
+ window.scrollTo({top:0,behavior:"smooth"});
+}
+
+function deletePlan(id){
+ if(confirm("Delete this plan?")){
+  data.plans=data.plans.filter(x=>x.id!=id);
+  save();
+ }
+}
+
+function resetPlanForm(){
+ document.getElementById("editPlanId").value="";
+ document.getElementById("pSpeed").value="";
+ document.getElementById("pPrice").value="";
+ document.getElementById("pTax").value="No Tax";
+ document.getElementById("pStatus").value="Active";
+ document.getElementById("planFormTitle").textContent="Add Internet Plan";
+}
+
+function renderPlans(){
+ const rows=document.getElementById("planRows");
+ rows.innerHTML="";
+
+ data.plans.forEach(p=>{
+  rows.innerHTML+=`
+   <tr>
+    <td>${p.speed}</td>
+    <td>${money(p.price)}</td>
+    <td>${p.tax}</td>
+    <td><span class="badge ${p.status==="Inactive"?"inactive":""}">${p.status}</span></td>
+    <td>
+     <button class="action" onclick="editPlan(${p.id})">Edit</button>
+     <button class="action danger" onclick="deletePlan(${p.id})">Delete</button>
+    </td>
+   </tr>`;
  });
- customerForm.reset(); cInstall.value=500; save();
-};
 
-billForm.onsubmit=e=>{
- e.preventDefault();
- let c=db.customers.find(x=>x.id===bCustomer.value);
- db.bills.unshift({
-  receipt:'ONS-'+new Date().getFullYear()+'-'+String(db.bills.length+1).padStart(4,'0'),
-  customerId:c.id,name:c.name,amount:+bAmount.value,
-  date:new Date().toISOString().slice(0,10),due:bDue.value,
-  status:bStatus.value,method:bMethod.value
+ const active=data.plans.filter(p=>p.status==="Active");
+
+ const cp=document.getElementById("cPlan");
+ cp.innerHTML='<option value="">Select Internet Plan</option>';
+
+ active.forEach(p=>{
+  cp.innerHTML+=`<option value="${p.id}">${p.speed} — ${money(p.price)} ${p.tax}</option>`;
  });
- billForm.reset(); save();
-};
-
-inventoryForm.onsubmit=e=>{
- e.preventDefault();
- db.inventory.push({type:iType.value,model:iModel.value,serial:iSerial.value,
- mac:iMac.value,price:+iPrice.value,supplier:iSupplier.value,status:iStatus.value});
- inventoryForm.reset(); save();
-};
-
-function delCustomer(i){if(confirm('Delete this customer?')){db.customers.splice(i,1);save()}}
-function delInventory(i){if(confirm('Delete this item?')){db.inventory.splice(i,1);save()}}
-
-function printReceipt(i){
- let b=db.bills[i];
- let w=window.open('','_blank');
- w.document.write(`<h2>Orange Network Solution</h2><hr>
- <p><b>Receipt:</b> ${esc(b.receipt)}</p>
- <p><b>Customer:</b> ${esc(b.name)}</p>
- <p><b>Date:</b> ${esc(b.date)}</p>
- <p><b>Amount:</b> ₹${b.amount}</p>
- <p><b>Payment:</b> ${esc(b.method)}</p>
- <p><b>Status:</b> ${esc(b.status)}</p><hr>
- <p>Thank you.</p><script>window.print()<\/script>`);
- w.document.close();
 }
 
-function render(){
- customerRows.innerHTML=db.customers.map((c,i)=>`<tr>
- <td>${esc(c.id)}</td><td>${esc(c.name)}</td><td>${esc(c.phone)}</td>
- <td>${esc(c.speed)}</td><td>₹${c.fee}</td><td><span class="badge paid">${esc(c.status)}</span></td>
- <td><button class="btn danger" onclick="delCustomer(${i})">Delete</button></td></tr>`).join('');
+/* CUSTOMERS */
 
- bCustomer.innerHTML='<option value="">Select Customer</option>'+
- db.customers.map(c=>`<option value="${esc(c.id)}">${esc(c.name)} - ${esc(c.speed)}</option>`).join('');
+function addCustomer(){
+ const name=document.getElementById("cName").value.trim();
+ const phone=document.getElementById("cPhone").value.trim();
+ const planId=document.getElementById("cPlan").value;
 
- billRows.innerHTML=db.bills.map((b,i)=>{
- let overdue=b.status!=='Paid'&&b.due&&b.due<new Date().toISOString().slice(0,10);
- return `<tr><td>${esc(b.receipt)}</td><td>${esc(b.name)}</td><td>${esc(b.date)}</td>
- <td>₹${b.amount}</td><td>${esc(b.method)}</td>
- <td><span class="badge ${b.status==='Paid'?'paid':overdue?'overdue':'pending'}">${overdue?'Overdue':esc(b.status)}</span></td>
- <td><button class="btn" onclick="printReceipt(${i})">Print</button></td></tr>`;
- }).join('');
+ if(!name){
+  alert("Customer Name डालें");
+  return;
+ }
 
- inventoryRows.innerHTML=db.inventory.map((x,i)=>`<tr>
- <td>${esc(x.type)}</td><td>${esc(x.model)}</td><td>${esc(x.serial)}</td>
- <td>${esc(x.mac)}</td><td>${esc(x.status)}</td>
- <td><button class="btn danger" onclick="delInventory(${i})">Delete</button></td></tr>`).join('');
+ data.customers.push({
+  id:Date.now(),
+  name,
+  phone,
+  street:document.getElementById("cStreet").value.trim(),
+  zip:document.getElementById("cZip").value.trim(),
+  planId:Number(planId)||null,
+  installation:Number(document.getElementById("cInstall").value)||0,
+  refund:document.getElementById("cRefund").value
+ });
 
- let paid=db.bills.filter(x=>x.status==='Paid');
- let collection=paid.reduce((s,x)=>s+x.amount,0);
- let today=new Date().toISOString().slice(0,10);
- let overdue=db.bills.filter(x=>x.status!=='Paid'&&x.due&&x.due<today).length;
- let pending=db.bills.filter(x=>x.status!=='Paid').length;
+ ["cName","cPhone","cStreet","cZip","cInstall"].forEach(id=>{
+  document.getElementById(id).value="";
+ });
+ document.getElementById("cPlan").value="";
 
- dTotal.textContent=db.customers.length;
- dActive.textContent=db.customers.filter(x=>x.status==='Active').length;
- dCollection.textContent='₹'+collection;
- dPending.textContent=pending;
- dOverdue.textContent=overdue;
- dStock.textContent=db.inventory.filter(x=>x.status==='In Stock').length;
-
- rCollection.textContent='₹'+collection;
- rPaid.textContent=paid.length;
- rPending.textContent=pending;
- rCustomers.textContent=db.customers.length;
-
- recentPayments.innerHTML=paid.slice(0,5).map(x=>
- `<p><b>${esc(x.name)}</b> — ₹${x.amount} — ${esc(x.method)} — ${esc(x.date)}</p>`
- ).join('')||'No payments yet.';
+ save();
 }
+
+function deleteCustomer(id){
+ if(confirm("Delete this customer?")){
+  data.customers=data.customers.filter(x=>x.id!=id);
+  save();
+ }
+}
+
+function renderCustomers(){
+ const rows=document.getElementById("customerRows");
+ rows.innerHTML="";
+
+ data.customers.forEach(c=>{
+  const p=data.plans.find(x=>x.id==c.planId);
+  rows.innerHTML+=`
+   <tr>
+    <td>${c.name}</td>
+    <td>${c.phone||""}</td>
+    <td>${c.street||""} ${c.zip||""}</td>
+    <td>${p ? p.speed+" — "+money(p.price) : "No Plan"}</td>
+    <td>${money(c.installation)}<br><small>${c.refund}</small></td>
+    <td><button class="action danger" onclick="deleteCustomer(${c.id})">Delete</button></td>
+   </tr>`;
+ });
+
+ const sel=document.getElementById("payCustomer");
+ sel.innerHTML='<option value="">Select Customer</option>';
+
+ data.customers.forEach(c=>{
+  sel.innerHTML+=`<option value="${c.id}">${c.name}</option>`;
+ });
+}
+
+/* PAYMENTS */
+
+function addPayment(){
+ const customerId=Number(document.getElementById("payCustomer").value);
+ const amount=Number(document.getElementById("payAmount").value);
+ const date=document.getElementById("payDate").value;
+
+ if(!customerId || !amount){
+  alert("Customer और Amount चुनें");
+  return;
+ }
+
+ data.payments.push({
+  id:Date.now(),
+  customerId,
+  amount,
+  date:date || new Date().toISOString().slice(0,10)
+ });
+
+ document.getElementById("payAmount").value="";
+ save();
+}
+
+function deletePayment(id){
+ if(confirm("Delete payment?")){
+  data.payments=data.payments.filter(x=>x.id!=id);
+  save();
+ }
+}
+
+function renderPayments(){
+ const rows=document.getElementById("paymentRows");
+ rows.innerHTML="";
+
+ data.payments.forEach(p=>{
+  const c=data.customers.find(x=>x.id==p.customerId);
+  rows.innerHTML+=`
+   <tr>
+    <td>${c?c.name:"Customer"}</td>
+    <td>${money(p.amount)}</td>
+    <td>${p.date}</td>
+    <td><button class="action danger" onclick="deletePayment(${p.id})">Delete</button></td>
+   </tr>`;
+ });
+}
+
+/* INVENTORY */
+
+function addInventory(){
+ const item=document.getElementById("iItem").value.trim();
+ if(!item){
+  alert("Item name डालें");
+  return;
+ }
+
+ data.inventory.push({
+  id:Date.now(),
+  item,
+  model:document.getElementById("iModel").value.trim(),
+  qty:Number(document.getElementById("iQty").value)||0,
+  cost:Number(document.getElementById("iCost").value)||0
+ });
+
+ ["iItem","iModel","iQty","iCost"].forEach(id=>{
+  document.getElementById(id).value="";
+ });
+
+ save();
+}
+
+function deleteInventory(id){
+ if(confirm("Delete inventory item?")){
+  data.inventory=data.inventory.filter(x=>x.id!=id);
+  save();
+ }
+}
+
+function renderInventory(){
+ const rows=document.getElementById("inventoryRows");
+ rows.innerHTML="";
+
+ data.inventory.forEach(i=>{
+  rows.innerHTML+=`
+   <tr>
+    <td>${i.item}</td>
+    <td>${i.model}</td>
+    <td>${i.qty}</td>
+    <td>${money(i.cost)}</td>
+    <td><button class="action danger" onclick="deleteInventory(${i.id})">Delete</button></td>
+   </tr>`;
+ });
+}
+
+/* DASHBOARD & REPORT */
+
+function renderDashboard(){
+ const totalPayments=data.payments.reduce((a,b)=>a+Number(b.amount||0),0);
+ const inventoryQty=data.inventory.reduce((a,b)=>a+Number(b.qty||0),0);
+
+ document.getElementById("dCustomers").textContent=data.customers.length;
+ document.getElementById("dPlans").textContent=data.plans.filter(p=>p.status==="Active").length;
+ document.getElementById("dPayments").textContent=money(totalPayments);
+ document.getElementById("dInventory").textContent=inventoryQty;
+
+ document.getElementById("reportBox").innerHTML=`
+  <h3>Business Summary</h3>
+  <p><b>Total Customers:</b> ${data.customers.length}</p>
+  <p><b>Active Plans:</b> ${data.plans.filter(p=>p.status==="Active").length}</p>
+  <p><b>Total Payments Recorded:</b> ${money(totalPayments)}</p>
+  <p><b>Total Inventory Quantity:</b> ${inventoryQty}</p>
+ `;
+}
+
+/* BACKUP */
 
 function downloadBackup(){
- let blob=new Blob([JSON.stringify(db,null,2)],{type:'application/json'});
- let a=document.createElement('a');
+ const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
+ const a=document.createElement("a");
  a.href=URL.createObjectURL(blob);
- a.download='orange-isp-backup-'+new Date().toISOString().slice(0,10)+'.json';
+ a.download="Orange_Network_Solution_Backup.json";
  a.click();
  URL.revokeObjectURL(a.href);
 }
-function restoreBackup(input){
- let f=input.files[0]; if(!f)return;
- let r=new FileReader();
- r.onload=()=>{
-  try{db=JSON.parse(r.result);save();alert('Backup restored successfully.')}
-  catch(e){alert('Invalid backup file.')}
+
+function restoreBackup(){
+ const f=document.getElementById("restoreFile").files[0];
+ if(!f){
+  alert("Backup file चुनें");
+  return;
+ }
+
+ const reader=new FileReader();
+ reader.onload=e=>{
+  try{
+   const restored=JSON.parse(e.target.result);
+   if(!restored.plans || !restored.customers){
+    throw new Error();
+   }
+   data=restored;
+   save();
+   alert("Backup restored successfully");
+  }catch(err){
+   alert("Invalid backup file");
+  }
  };
- r.readAsText(f);
+ reader.readAsText(f);
 }
-render();
+
+function renderAll(){
+ renderPlans();
+ renderCustomers();
+ renderPayments();
+ renderInventory();
+ renderDashboard();
+}
+
+document.getElementById("payDate").value=new Date().toISOString().slice(0,10);
+renderAll();
 </script>
+
 </body>
 </html>
